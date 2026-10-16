@@ -4,15 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.content.Context;
 import android.print.PrintManager;
+import android.print.PrintAttributes;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
-import android.webkit.CookieManager;
 import android.webkit.WebSettings;
+import android.webkit.JavascriptInterface;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.JavascriptInterface;
-import android.print.PrintAttributes;
 
 public class MainActivity extends Activity {
 
@@ -32,17 +31,70 @@ public class MainActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
 
-        CookieManager.getInstance().setAcceptCookie(true);
-
-        webView.setWebViewClient(new WebViewClient());
-        webView.setWebChromeClient(new WebChromeClient());
-
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
-        setContentView(webView);
+        webView.addJavascriptInterface(
+            new PrintBridge(), "AndroidPrint"
+        );
 
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                view.evaluateJavascript(
+                    "(function() {" +
+                    "window.print = function() {" +
+                    "AndroidPrint.printPage();" +
+                    "};" +
+                    "})();",
+                    null
+                );
+            }
+        });
+
+        webView.setWebChromeClient(new WebChromeClient());
+
+        setContentView(webView);
         webView.loadUrl("https://jibonder.pythonanywhere.com");
+    }
+
+    private class PrintBridge {
+        @JavascriptInterface
+        public void printPage() {
+            runOnUiThread(() -> {
+                PrintManager printManager =
+                    (PrintManager) getSystemService(
+                        Context.PRINT_SERVICE
+                    );
+
+                if (printManager != null && webView != null) {
+                    PrintAttributes attributes =
+                        new PrintAttributes.Builder()
+                            .setMediaSize(
+                                PrintAttributes.MediaSize.ISO_A4
+                            )
+                            .setResolution(
+                                new PrintAttributes.Resolution(
+                                    "pdf", "PDF", 300, 300
+                                )
+                            )
+                            .setMinMargins(
+                                PrintAttributes.Margins.NO_MARGINS
+                            )
+                            .build();
+
+                    printManager.print(
+                        "Jibon Report",
+                        webView.createPrintDocumentAdapter(
+                            "Jibon Report"
+                        ),
+                        attributes
+                    );
+                }
+            });
+        }
     }
 
     @Override
@@ -54,4 +106,3 @@ public class MainActivity extends Activity {
         }
     }
 }
-
