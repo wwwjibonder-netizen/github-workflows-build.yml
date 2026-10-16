@@ -24,6 +24,7 @@ import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
     private WebView webView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private static final int CAMERA_PERMISSION_REQUEST = 100;
     private static final int FILE_REQUEST = 101;
     private PermissionRequest pendingPermissionRequest;
