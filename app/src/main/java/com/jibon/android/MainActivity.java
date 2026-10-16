@@ -126,19 +126,24 @@ public class MainActivity extends Activity {
             }
         });
 
-        webView.setOnTouchListener((view, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                startY = event.getY();
-            } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                float distance = event.getY() - startY;
-                if (distance > 180 && webView.getScrollY() == 0) {
-                    webView.reload();
-                }
-            }
-            return false;
-        });
+
 
         setContentView(webView);
+        swipeRefreshLayout = new SwipeRefreshLayout(this);
+
+swipeRefreshLayout.setOnRefreshListener(() -> {
+    webView.reload();
+});
+
+swipeRefreshLayout.addView(
+    webView,
+    new SwipeRefreshLayout.LayoutParams(
+        SwipeRefreshLayout.LayoutParams.MATCH_PARENT,
+        SwipeRefreshLayout.LayoutParams.MATCH_PARENT
+    )
+);
+
+setContentView(swipeRefreshLayout);
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
         } else {
