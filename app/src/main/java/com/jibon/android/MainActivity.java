@@ -131,7 +131,7 @@ public class MainActivity extends Activity {
 
 
 
-        setContentView(webView);
+        
         swipeRefreshLayout = new SwipeRefreshLayout(this);
 
 swipeRefreshLayout.setOnRefreshListener(() -> {
