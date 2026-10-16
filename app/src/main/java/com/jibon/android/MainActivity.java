@@ -11,6 +11,8 @@ import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
+import android.print.PrintAttributes;
 
 public class MainActivity extends Activity {
 
