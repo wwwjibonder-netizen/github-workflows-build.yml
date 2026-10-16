@@ -163,6 +163,34 @@ public class MainActivity extends Activity {
             }
         });
 
+        webView.setOnTouchListener(new View.OnTouchListener() {
+    private float startY;
+    private boolean refreshing = false;
+
+    @Override
+    public boolean onTouch(View view,
+                           android.view.MotionEvent event) {
+        switch (event.getAction()) {
+            case android.view.MotionEvent.ACTION_DOWN:
+                startY = event.getY();
+                refreshing = false;
+                break;
+
+            case android.view.MotionEvent.ACTION_UP:
+                float distance = event.getY() - startY;
+
+                if (distance > 180
+                        && webView.getScrollY() == 0
+                        && !refreshing) {
+                    refreshing = true;
+                    webView.reload();
+                }
+                break;
+        }
+
+        return false;
+    }
+});
         setContentView(webView);
 
         if (savedInstanceState != null) {
@@ -230,10 +258,69 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class PrintBridge {
+    
+private class PrintBridge {
 
-        @JavascriptInterface
-        public void printPage() {
+    @JavascriptInterface
+    public void printPage() {
+        runOnUiThread(() -> {
+            if (webView == null) return;
+
+            webView.evaluateJavascript(
+                "(function() {" +
+                "var style = document.getElementById('android-print-style');" +
+                "if (!style) {" +
+                "style = document.createElement('style');" +
+                "style.id = 'android-print-style';" +
+                "document.head.appendChild(style);" +
+                "}" +
+                "style.textContent = '@media print {' +" +
+                "'@page { size: A4; margin: 12mm; }' +" +
+                "'html, body { height: auto !important; overflow: visible !important; }' +" +
+                "'table { width: 100% !important; border-collapse: collapse; }' +" +
+                "'tr { break-inside: avoid; page-break-inside: avoid; }' +" +
+                "'thead { display: table-header-group; }' +" +
+                "'tfoot { display: table-footer-group; }' +" +
+                "'img { max-width: 100% !important; }' +" +
+                "'}' ;" +
+                "window.AndroidPrintReady = true;" +
+                "})();",
+                result -> {
+                    PrintManager printManager =
+                        (PrintManager) getSystemService(
+                            Context.PRINT_SERVICE
+                        );
+
+                    if (printManager != null && webView != null) {
+                        PrintAttributes attributes =
+                            new PrintAttributes.Builder()
+                                .setMediaSize(
+                                    PrintAttributes.MediaSize.ISO_A4
+                                )
+                                .setResolution(
+                                    new PrintAttributes.Resolution(
+                                        "pdf", "PDF", 300, 300
+                                    )
+                                )
+                                .setMinMargins(
+                                    PrintAttributes.Margins.NO_MARGINS
+                                )
+                                .build();
+
+                        printManager.print(
+                            "Jibon Report",
+                            webView.createPrintDocumentAdapter(
+                                "Jibon Report"
+                            ),
+                            attributes
+                        );
+                    }
+                }
+            );
+        });
+    }
+}
+
 
             runOnUiThread(() -> {
 
