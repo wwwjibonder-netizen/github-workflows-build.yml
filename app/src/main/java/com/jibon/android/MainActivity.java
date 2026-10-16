@@ -1,5 +1,5 @@
 package com.jibon.android;
-
+import android.webkit.PermissionRequest;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.app.Activity;
@@ -19,6 +19,7 @@ public class MainActivity extends Activity {
 
     private WebView webView;
     private static final int CAMERA_PERMISSION_REQUEST = 100;
+    private PermissionRequest pendingPermissionRequest;
 
 
     @Override
@@ -28,6 +29,41 @@ public class MainActivity extends Activity {
         getWindow().setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         );
+
+        
+webView.setWebChromeClient(new WebChromeClient() {
+    @Override
+    public void onPermissionRequest(PermissionRequest request) {
+        runOnUiThread(() -> {
+            boolean wantsCamera = false;
+
+            for (String resource : request.getResources()) {
+                if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
+                    wantsCamera = true;
+                    break;
+                }
+            }
+
+            if (!wantsCamera) {
+                request.deny();
+                return;
+            }
+
+            if (checkSelfPermission(Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+                request.grant(new String[] {
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                });
+            } else {
+                pendingPermissionRequest = request;
+                requestPermissions(
+                    new String[] { Manifest.permission.CAMERA },
+                    CAMERA_PERMISSION_REQUEST
+                );
+            }
+        });
+    }
+});
 
         webView = new WebView(this);
 
