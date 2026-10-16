@@ -214,7 +214,7 @@ public class MainActivity extends Activity {
                 .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
                 .setResolution(new PrintAttributes.Resolution(
                     "pdf", "PDF", 300, 300))
-                .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                .setMinMargins(PrintAttributes.Margins.DEFAULT)
                 .build();
 
             manager.print("Jibon Report",
