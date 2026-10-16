@@ -1,5 +1,7 @@
 package com.jibon.android;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.app.Activity;
 import android.os.Bundle;
 import android.content.Context;
@@ -16,6 +18,8 @@ import android.view.WindowManager;
 public class MainActivity extends Activity {
 
     private WebView webView;
+    private static final int CAMERA_PERMISSION_REQUEST = 100;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        webView.setWebChromeClient(new WebChromeClient());
+        
 
         setContentView(webView);
         webView.loadUrl("https://jibonder.pythonanywhere.com");
