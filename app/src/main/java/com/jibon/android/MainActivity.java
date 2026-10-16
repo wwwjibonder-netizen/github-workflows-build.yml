@@ -1,8 +1,9 @@
-
 package com.jibon.android;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.content.Context;
+import android.print.PrintManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
