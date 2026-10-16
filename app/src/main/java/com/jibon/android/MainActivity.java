@@ -224,7 +224,7 @@ setContentView(swipeRefreshLayout);
                 .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
                 .setResolution(new PrintAttributes.Resolution(
                     "pdf", "PDF", 300, 300))
-                .setMinMargins(PrintAttributes.Margins.DEFAULT)
+                .setMinMargins(new PrintAttributes.Margins(300, 300, 300, 300))
                 .build();
 
             manager.print("Jibon Report",
