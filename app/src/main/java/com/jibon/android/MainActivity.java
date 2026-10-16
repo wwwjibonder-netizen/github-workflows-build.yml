@@ -100,6 +100,33 @@ webView.setWebChromeClient(new WebChromeClient() {
         webView.loadUrl("https://jibonder.pythonanywhere.com");
     }
 
+    
+@Override
+public void onRequestPermissionsResult(
+        int requestCode,
+        String[] permissions,
+        int[] grantResults) {
+    super.onRequestPermissionsResult(
+        requestCode, permissions, grantResults
+    );
+
+    if (requestCode == CAMERA_PERMISSION_REQUEST
+            && pendingPermissionRequest != null) {
+
+        PermissionRequest request = pendingPermissionRequest;
+        pendingPermissionRequest = null;
+
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            request.grant(new String[] {
+                PermissionRequest.RESOURCE_VIDEO_CAPTURE
+            });
+        } else {
+            request.deny();
+        }
+    }
+}
+
     private class PrintBridge {
         @JavascriptInterface
         public void printPage() {
