@@ -60,6 +60,9 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                if (swipeRefreshLayout != null) {
+    swipeRefreshLayout.setRefreshing(false);
+}
                 view.evaluateJavascript(
                     "window.print=function(){AndroidPrint.printPage();};",
                     null
